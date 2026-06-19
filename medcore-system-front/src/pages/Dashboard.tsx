@@ -1,6 +1,13 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
 import toast from 'react-hot-toast'
+import {
+  IconUsers,
+  IconStethoscope,
+  IconCircleCheck,
+  IconClipboardList,
+  IconCalendarStats
+} from '@tabler/icons-react'
 
 interface Totais {
   pacientes: number
@@ -52,11 +59,11 @@ export default function Dashboard() {
   useEffect(() => { carregar() }, [])
 
   const cards = [
-    { titulo: 'Pacientes', valor: totais.pacientes, cor: 'bg-blue-500', icone: '👤' },
-    { titulo: 'Profissionais', valor: totais.profissionais, cor: 'bg-purple-500', icone: '🩺' },
-    { titulo: 'Profissionais Ativos', valor: totais.profissionaisAtivos, cor: 'bg-green-500', icone: '✅' },
-    { titulo: 'Especialidades', valor: totais.especialidades, cor: 'bg-yellow-500', icone: '📋' },
-    { titulo: 'Atendimentos Hoje', valor: totais.atendimentosHoje, cor: 'bg-red-500', icone: '📅' },
+    { titulo: 'Pacientes', valor: totais.pacientes, cor: 'bg-blue-500', icone: <IconUsers size={40} stroke={1.5} /> },
+    { titulo: 'Profissionais', valor: totais.profissionais, cor: 'bg-purple-500', icone: <IconStethoscope size={40} stroke={1.5} /> },
+    { titulo: 'Profissionais Ativos', valor: totais.profissionaisAtivos, cor: 'bg-green-500', icone: <IconCircleCheck size={40} stroke={1.5} /> },
+    { titulo: 'Especialidades', valor: totais.especialidades, cor: 'bg-yellow-500', icone: <IconClipboardList size={40} stroke={1.5} /> },
+    { titulo: 'Atendimentos Hoje', valor: totais.atendimentosHoje, cor: 'bg-red-500', icone: <IconCalendarStats size={40} stroke={1.5} /> },
   ]
 
   return (
