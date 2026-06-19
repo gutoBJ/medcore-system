@@ -41,3 +41,10 @@ CREATE TABLE atendimentos (
   observacoes TEXT,
   valor NUMERIC(10, 2)
 );
+
+CREATE TABLE usuarios (
+  id SERIAL PRIMARY KEY,
+  nome VARCHAR(150) NOT NULL,
+  email VARCHAR(150) UNIQUE NOT NULL,
+  senha VARCHAR(255) NOT NULL
+);
