@@ -1,23 +1,23 @@
-const repository = require("../repository/pacienteRepository")
+const repository = require("../repository/profissionalRepository")
 
 const listarTodos = async () => {
   return await repository.findAll()
 }
 
 const buscarPorId = async (id) => {
-  const paciente = await repository.findById(id)
-  if (!paciente) throw new Error('Paciente não encontrado')
-  return paciente
+  const profissional = await repository.findById(id)
+  if (!profissional) throw new Error('Profissional não encontrado')
+  return profissional
 }
 
 const criar = async (dados) => {
-  if (!dados.nome_completo) throw new Error('O campo nome é obrigatório')
+  if (!dados.nome) throw new Error('O campo nome é obrigatório')
   return await repository.create(dados)
 }
 
 const atualizar = async (id, dados) => {
   await buscarPorId(id) // já valida se existe
-  if (!dados.nome_completo) throw new Error('O campo nome é obrigatório')
+  if (!dados.nome) throw new Error('O campo nome é obrigatório')
   return await repository.update(id, dados)
 }
 
