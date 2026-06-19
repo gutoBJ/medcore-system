@@ -5,9 +5,9 @@ const listarTodos = async () => {
 }
 
 const buscarPorId = async (id) => {
-  const profissional = await repository.findById(id)
-  if (!profissional) throw new Error('Atendimento não encontrado')
-  return profissional
+  const atendimento = await repository.findById(id)
+  if (!atendimento) throw new Error('Atendimento não encontrado')
+  return atendimento
 }
 
 const criar = async (dados) => {
