@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
-import { Pacientes } from './pages/Pacientes'
+import Pacientes from './pages/Pacientes'
 import { Especialidades } from './pages/Especialidades'
 import { Profissionais } from './pages/Profissionais'
 import { Atendimentos } from './pages/Atendimentos'
