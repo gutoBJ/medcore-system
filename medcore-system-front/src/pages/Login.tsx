@@ -1,21 +1,38 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/axios'
+import toast from 'react-hot-toast'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
-  const [erro, setErro] = useState('')
   const navigate = useNavigate()
+
+  useEffect(() => { document.title = 'MedCore System - Login' }, [])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!email || !senha) {
+      toast.error('Email e senha são obrigatórios')
+      return
+    }
+
     try {
       const res = await api.post('/auth/login', { email, senha })
       localStorage.setItem('token', res.data.token)
-      navigate('/pacientes')
+
+      toast.success(`Bem-vindo, ${res.data.usuario.nome}! 👋`, {
+        duration: 3000,
+        style: {
+          fontWeight: '500',
+          fontSize: '15px',
+        }
+      })
+
+      setTimeout(() => navigate('/dashboard'), 1000)
     } catch {
-      setErro('Email ou senha inválidos')
+      toast.error('Email ou senha inválidos')
     }
   }
 
@@ -23,7 +40,6 @@ export default function Login() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded shadow w-full max-w-sm">
         <h1 className="text-2xl font-bold mb-6 text-center text-blue-600">MedCore System</h1>
-        {erro && <p className="text-red-500 text-sm mb-4">{erro}</p>}
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <input
             type="email"
@@ -39,7 +55,7 @@ export default function Login() {
             onChange={e => setSenha(e.target.value)}
             className="border p-2 rounded"
           />
-          <button type="submit" className="bg-blue-600 text-white p-2 rounded cursor-pointer hover:bg-blue-700">
+          <button type="submit" className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 cursor-pointer">
             Entrar
           </button>
         </form>

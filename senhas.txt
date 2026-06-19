@@ -1,2 +1,2 @@
-email: admin@clinica.com
-senha: 123456
+admin@clinica.com
+123456

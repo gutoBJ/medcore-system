@@ -1,10 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Pacientes from './pages/Pacientes'
-import { Especialidades } from './pages/Especialidades'
-import { Profissionais } from './pages/Profissionais'
-import { Atendimentos } from './pages/Atendimentos'
+import Especialidades from './pages/Especialidades'
+import Profissionais from './pages/Profissionais'
+import Atendimentos from './pages/Atendimentos'
 import Navbar from './components/Navbar'
+import Dashboard from './pages/Dashboard'
 
 const RotaProtegida = ({ children }: { children: React.ReactNode }) => {
   const token = localStorage.getItem('token')
@@ -21,11 +22,12 @@ function App() {
             <Navbar />
             <div className="p-6">
               <Routes>
+                <Route path="/" element={<Navigate to="/dashboard" />} />
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/pacientes" element={<Pacientes />} />
                 <Route path="/profissionais" element={<Profissionais />} />
                 <Route path="/especialidades" element={<Especialidades />} />
                 <Route path="/atendimentos" element={<Atendimentos />} />
-                <Route path="/" element={<Navigate to="/pacientes" />} />
               </Routes>
             </div>
           </RotaProtegida>
