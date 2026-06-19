@@ -28,4 +28,13 @@ router.post('/profissionais', profissionalController.criar)
 router.put('/profissionais/:id', profissionalController.atualizar)
 router.delete('/profissionais/:id', profissionalController.remover)
 
+// Rotas Atendimentos
+const atendimentoController = require("./app/controllers/atendimentoController")
+
+router.get('/atendimentos', atendimentoController.listarTodos)
+router.get('/atendimentos/:id', atendimentoController.buscarPorId)
+router.post('/atendimentos', atendimentoController.criar)
+router.put('/atendimentos/:id', atendimentoController.atualizar)
+router.delete('/atendimentos/:id', atendimentoController.remover)
+
 module.exports = router
