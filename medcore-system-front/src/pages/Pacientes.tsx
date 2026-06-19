@@ -48,7 +48,6 @@ export default function Pacientes() {
   }
 
   useEffect(() => { carregarPacientes() }, [])
-
   useEffect(() => { document.title = 'MedCore System - Pacientes' }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -105,17 +104,19 @@ export default function Pacientes() {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-gray-700">Pacientes</h1>
-        <button onClick={() => { setForm(inicial); setEditandoId(null); setMostrarForm(true) }}
-          className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700">
+        <button
+          onClick={() => { setForm(inicial); setEditandoId(null); setMostrarForm(true) }}
+          className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700 text-sm md:text-base"
+        >
           + Novo Paciente
         </button>
       </div>
 
       {mostrarForm && (
-        <div className="bg-white p-6 rounded shadow mb-6">
+        <div className="bg-white p-4 md:p-6 rounded shadow mb-6">
           <h2 className="text-lg font-semibold mb-4">{editandoId ? 'Editar' : 'Novo'} Paciente</h2>
-          <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
-            <input name="nome_completo" placeholder="Nome completo *" value={form.nome_completo} onChange={handleChange} className="border p-2 rounded col-span-2" />
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input name="nome_completo" placeholder="Nome completo *" value={form.nome_completo} onChange={handleChange} className="border p-2 rounded md:col-span-2" />
             <input name="cpf" placeholder="CPF *" value={form.cpf} onChange={handleChange} className="border p-2 rounded" />
             <input name="data_nascimento" type="date" value={form.data_nascimento} onChange={handleChange} className="border p-2 rounded" />
             <select name="sexo" value={form.sexo} onChange={handleChange} className="border p-2 rounded">
@@ -124,11 +125,11 @@ export default function Pacientes() {
               <option value="F">Feminino</option>
             </select>
             <input name="telefone" placeholder="Telefone" value={form.telefone} onChange={handleChange} className="border p-2 rounded" />
-            <input name="email" placeholder="Email" value={form.email} onChange={handleChange} className="border p-2 rounded col-span-2" />
-            <input name="endereco" placeholder="Endereço" value={form.endereco} onChange={handleChange} className="border p-2 rounded col-span-2" />
+            <input name="email" placeholder="Email" value={form.email} onChange={handleChange} className="border p-2 rounded md:col-span-2" />
+            <input name="endereco" placeholder="Endereço" value={form.endereco} onChange={handleChange} className="border p-2 rounded md:col-span-2" />
             <input name="convenio" placeholder="Convênio" value={form.convenio} onChange={handleChange} className="border p-2 rounded" />
             <input name="numero_carteirinha" placeholder="Número da carteirinha" value={form.numero_carteirinha} onChange={handleChange} className="border p-2 rounded" />
-            <div className="col-span-2 flex gap-3">
+            <div className="md:col-span-2 flex gap-3">
               <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700">
                 {editandoId ? 'Salvar alterações' : 'Cadastrar'}
               </button>
@@ -140,7 +141,6 @@ export default function Pacientes() {
         </div>
       )}
 
-      {/* Busca */}
       <input
         type="text"
         placeholder="Buscar por nome ou CPF..."
@@ -149,42 +149,63 @@ export default function Pacientes() {
         className="border p-2 rounded w-full mb-4"
       />
 
-      {/* Spinner */}
       {loading ? (
         <div className="flex justify-center py-10">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="bg-white rounded shadow overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
-              <tr>
-                <th className="p-3 text-left">Nome</th>
-                <th className="p-3 text-left">CPF</th>
-                <th className="p-3 text-left">Telefone</th>
-                <th className="p-3 text-left">Convênio</th>
-                <th className="p-3 text-left">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pacientesFiltrados.map(p => (
-                <tr key={p.id} className="border-t hover:bg-gray-50">
-                  <td className="p-3">{p.nome_completo}</td>
-                  <td className="p-3">{p.cpf}</td>
-                  <td className="p-3">{p.telefone}</td>
-                  <td className="p-3">{p.convenio}</td>
-                  <td className="p-3 flex gap-2">
-                    <button onClick={() => handleEditar(p)} className="bg-yellow-400 text-white px-3 py-1 rounded cursor-pointer hover:bg-yellow-500">Editar</button>
-                    <button onClick={() => handleDeletar(p.id)} className="bg-red-500 text-white px-3 py-1 rounded cursor-pointer hover:bg-red-600">Deletar</button>
-                  </td>
+        <>
+          {/* Desktop: tabela */}
+          <div className="hidden md:block bg-white rounded shadow overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
+                <tr>
+                  <th className="p-3 text-left">Nome</th>
+                  <th className="p-3 text-left">CPF</th>
+                  <th className="p-3 text-left">Telefone</th>
+                  <th className="p-3 text-left">Convênio</th>
+                  <th className="p-3 text-left">Ações</th>
                 </tr>
-              ))}
-              {pacientesFiltrados.length === 0 && (
-                <tr><td colSpan={5} className="p-4 text-center text-gray-400">Nenhum paciente encontrado</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {pacientesFiltrados.map(p => (
+                  <tr key={p.id} className="border-t hover:bg-gray-50">
+                    <td className="p-3">{p.nome_completo}</td>
+                    <td className="p-3">{p.cpf}</td>
+                    <td className="p-3">{p.telefone}</td>
+                    <td className="p-3">{p.convenio || '—'}</td>
+                    <td className="p-3 flex gap-2">
+                      <button onClick={() => handleEditar(p)} className="bg-yellow-400 text-white px-3 py-1 rounded cursor-pointer hover:bg-yellow-500">Editar</button>
+                      <button onClick={() => handleDeletar(p.id)} className="bg-red-500 text-white px-3 py-1 rounded cursor-pointer hover:bg-red-600">Deletar</button>
+                    </td>
+                  </tr>
+                ))}
+                {pacientesFiltrados.length === 0 && (
+                  <tr><td colSpan={5} className="p-4 text-center text-gray-400">Nenhum paciente encontrado</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile: cards */}
+          <div className="md:hidden flex flex-col gap-3">
+            {pacientesFiltrados.length === 0 && (
+              <p className="text-center text-gray-400 py-6">Nenhum paciente encontrado</p>
+            )}
+            {pacientesFiltrados.map(p => (
+              <div key={p.id} className="bg-white rounded shadow p-4 flex flex-col gap-1.5">
+                <p className="font-medium text-gray-800">{p.nome_completo}</p>
+                <p className="text-sm text-gray-500">CPF: {p.cpf}</p>
+                <p className="text-sm text-gray-500">Telefone: {p.telefone || '—'}</p>
+                <p className="text-sm text-gray-500">Convênio: {p.convenio || '—'}</p>
+                <div className="flex gap-2 mt-2">
+                  <button onClick={() => handleEditar(p)} className="flex-1 bg-yellow-400 text-white py-1.5 rounded cursor-pointer hover:bg-yellow-500 text-sm">Editar</button>
+                  <button onClick={() => handleDeletar(p.id)} className="flex-1 bg-red-500 text-white py-1.5 rounded cursor-pointer hover:bg-red-600 text-sm">Deletar</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   )

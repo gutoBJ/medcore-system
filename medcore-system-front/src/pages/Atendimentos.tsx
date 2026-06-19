@@ -2,15 +2,8 @@ import { useEffect, useState } from 'react'
 import api from '../api/axios'
 import toast from 'react-hot-toast'
 
-interface Paciente {
-  id: number
-  nome_completo: string
-}
-
-interface Profissional {
-  id: number
-  nome: string
-}
+interface Paciente { id: number; nome_completo: string }
+interface Profissional { id: number; nome: string }
 
 interface Atendimento {
   id: number
@@ -27,14 +20,15 @@ interface Atendimento {
 }
 
 const inicial: Omit<Atendimento, 'id' | 'paciente_nome' | 'profissional_nome'> = {
-  paciente_id: 0,
-  profissional_id: 0,
-  data_hora: '',
-  tipo: '',
-  status: '',
-  diagnostico: '',
-  observacoes: '',
-  valor: 0,
+  paciente_id: 0, profissional_id: 0, data_hora: '',
+  tipo: '', status: '', diagnostico: '', observacoes: '', valor: 0,
+}
+
+const statusCor = (status: string) => {
+  if (status === 'Concluído') return 'bg-green-100 text-green-700'
+  if (status === 'Cancelado') return 'bg-red-100 text-red-700'
+  if (status === 'Em andamento') return 'bg-yellow-100 text-yellow-700'
+  return 'bg-blue-100 text-blue-700'
 }
 
 export default function Atendimentos() {
@@ -52,13 +46,9 @@ export default function Atendimentos() {
     setLoading(true)
     try {
       const [atRes, pacRes, profRes] = await Promise.all([
-        api.get('/atendimentos'),
-        api.get('/pacientes'),
-        api.get('/profissionais'),
+        api.get('/atendimentos'), api.get('/pacientes'), api.get('/profissionais'),
       ])
-      setAtendimentos(atRes.data)
-      setPacientes(pacRes.data)
-      setProfissionais(profRes.data)
+      setAtendimentos(atRes.data); setPacientes(pacRes.data); setProfissionais(profRes.data)
     } catch {
       toast.error('Erro ao carregar dados')
     } finally {
@@ -81,7 +71,6 @@ export default function Atendimentos() {
   }
 
   useEffect(() => { carregar() }, [])
-
   useEffect(() => { document.title = 'MedCore System - Atendimentos' }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -91,8 +80,7 @@ export default function Atendimentos() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.paciente_id || !form.profissional_id || !form.data_hora || !form.tipo) {
-      toast.error('Paciente, profissional, data/hora e tipo são obrigatórios')
-      return
+      toast.error('Paciente, profissional, data/hora e tipo são obrigatórios'); return
     }
     try {
       if (editandoId) {
@@ -102,10 +90,7 @@ export default function Atendimentos() {
         await api.post('/atendimentos', form)
         toast.success('Atendimento cadastrado!')
       }
-      setForm(inicial)
-      setEditandoId(null)
-      setMostrarForm(false)
-      carregar()
+      setForm(inicial); setEditandoId(null); setMostrarForm(false); carregar()
     } catch (err: any) {
       toast.error(err.response?.data?.erro || 'Erro ao salvar')
     }
@@ -114,52 +99,44 @@ export default function Atendimentos() {
   const handleEditar = (a: Atendimento) => {
     const { id, paciente_nome, profissional_nome, ...dados } = a
     setForm({ ...dados, data_hora: dados.data_hora?.slice(0, 16) })
-    setEditandoId(id)
-    setMostrarForm(true)
+    setEditandoId(id); setMostrarForm(true)
   }
 
   const handleDeletar = async (id: number) => {
     if (!confirm('Deseja deletar este atendimento?')) return
     try {
       await api.delete(`/atendimentos/${id}`)
-      toast.success('Atendimento deletado!')
-      carregar()
+      toast.success('Atendimento deletado!'); carregar()
     } catch {
       toast.error('Erro ao deletar')
     }
   }
 
-  const atendimentosFiltrados = atendimentos.filter(a =>
-    filtroStatus ? a.status === filtroStatus : true
-  )
+  const filtrados = atendimentos.filter(a => filtroStatus ? a.status === filtroStatus : true)
 
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-gray-700">Atendimentos</h1>
         <button onClick={() => { setForm(inicial); setEditandoId(null); setMostrarForm(true) }}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer">
+          className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700 text-sm md:text-base">
           + Novo Atendimento
         </button>
       </div>
 
       {mostrarForm && (
-        <div className="bg-white p-6 rounded shadow mb-6">
+        <div className="bg-white p-4 md:p-6 rounded shadow mb-6">
           <h2 className="text-lg font-semibold mb-4">{editandoId ? 'Editar' : 'Novo'} Atendimento</h2>
-          <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <select name="paciente_id" value={form.paciente_id} onChange={handleChange} className="border p-2 rounded cursor-pointer">
               <option value="">Selecione o paciente *</option>
-              {pacientes.map(p => (
-                <option key={p.id} value={p.id}>{p.nome_completo}</option>
-              ))}
+              {pacientes.map(p => <option key={p.id} value={p.id}>{p.nome_completo}</option>)}
             </select>
             <select name="profissional_id" value={form.profissional_id} onChange={handleChange} className="border p-2 rounded cursor-pointer">
               <option value="">Selecione o profissional *</option>
-              {profissionais.map(p => (
-                <option key={p.id} value={p.id}>{p.nome}</option>
-              ))}
+              {profissionais.map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}
             </select>
-            <input name="data_hora" type="datetime-local" value={form.data_hora} onChange={handleChange} className="border p-2 rounded cursor-pointer" />
+            <input name="data_hora" type="datetime-local" value={form.data_hora} onChange={handleChange} className="border p-2 rounded" />
             <select name="tipo" value={form.tipo} onChange={handleChange} className="border p-2 rounded cursor-pointer">
               <option value="">Tipo *</option>
               <option value="Consulta">Consulta</option>
@@ -174,13 +151,13 @@ export default function Atendimentos() {
               <option value="Cancelado">Cancelado</option>
             </select>
             <input name="valor" type="number" placeholder="Valor (R$)" value={form.valor} onChange={handleChange} className="border p-2 rounded" />
-            <textarea name="diagnostico" placeholder="Diagnóstico" value={form.diagnostico} onChange={handleChange} className="border p-2 rounded col-span-2 resize-none h-20" />
-            <textarea name="observacoes" placeholder="Observações" value={form.observacoes} onChange={handleChange} className="border p-2 rounded col-span-2 resize-none h-20" />
-            <div className="col-span-2 flex gap-3">
-              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 cursor-pointer">
+            <textarea name="diagnostico" placeholder="Diagnóstico" value={form.diagnostico} onChange={handleChange} className="border p-2 rounded md:col-span-2 resize-none h-20" />
+            <textarea name="observacoes" placeholder="Observações" value={form.observacoes} onChange={handleChange} className="border p-2 rounded md:col-span-2 resize-none h-20" />
+            <div className="md:col-span-2 flex gap-3">
+              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700">
                 {editandoId ? 'Salvar alterações' : 'Cadastrar'}
               </button>
-              <button type="button" onClick={() => setMostrarForm(false)} className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 cursor-pointer">
+              <button type="button" onClick={() => setMostrarForm(false)} className="bg-gray-300 px-4 py-2 rounded cursor-pointer hover:bg-gray-400">
                 Cancelar
               </button>
             </div>
@@ -189,18 +166,9 @@ export default function Atendimentos() {
       )}
 
       {/* Filtros */}
-      <div className="flex gap-4 mb-4">
-        <input
-          type="date"
-          value={filtroData}
-          onChange={e => filtrarPorData(e.target.value)}
-          className="border p-2 rounded cursor-pointer"
-        />
-        <select
-          value={filtroStatus}
-          onChange={e => setFiltroStatus(e.target.value)}
-          className="border p-2 rounded cursor-pointer"
-        >
+      <div className="flex flex-col sm:flex-row gap-3 mb-4">
+        <input type="date" value={filtroData} onChange={e => filtrarPorData(e.target.value)} className="border p-2 rounded cursor-pointer" />
+        <select value={filtroStatus} onChange={e => setFiltroStatus(e.target.value)} className="border p-2 rounded cursor-pointer">
           <option value="">Todos os status</option>
           <option value="Agendado">Agendado</option>
           <option value="Em andamento">Em andamento</option>
@@ -220,49 +188,66 @@ export default function Atendimentos() {
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="bg-white rounded shadow overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
-              <tr>
-                <th className="p-3 text-left">Paciente</th>
-                <th className="p-3 text-left">Profissional</th>
-                <th className="p-3 text-left">Data/Hora</th>
-                <th className="p-3 text-left">Tipo</th>
-                <th className="p-3 text-left">Status</th>
-                <th className="p-3 text-left">Valor</th>
-                <th className="p-3 text-left">Ações</th>
-              </tr>
-            </thead>
-            <tbody>
-              {atendimentosFiltrados.map(a => (
-                <tr key={a.id} className="border-t hover:bg-gray-50">
-                  <td className="p-3">{a.paciente_nome}</td>
-                  <td className="p-3">{a.profissional_nome}</td>
-                  <td className="p-3">{new Date(a.data_hora).toLocaleString('pt-BR')}</td>
-                  <td className="p-3">{a.tipo}</td>
-                  <td className="p-3">
-                    <span className={`px-2 py-1 rounded text-xs font-semibold ${
-                      a.status === 'Concluído' ? 'bg-green-100 text-green-700' :
-                      a.status === 'Cancelado' ? 'bg-red-100 text-red-700' :
-                      a.status === 'Em andamento' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-blue-100 text-blue-700'
-                    }`}>
-                      {a.status}
-                    </span>
-                  </td>
-                  <td className="p-3">{a.valor ? `R$ ${Number(a.valor).toFixed(2)}` : '—'}</td>
-                  <td className="p-3 flex gap-2">
-                    <button onClick={() => handleEditar(a)} className="bg-yellow-400 text-white px-3 py-1 rounded hover:bg-yellow-500 cursor-pointer">Editar</button>
-                    <button onClick={() => handleDeletar(a.id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 cursor-pointer">Deletar</button>
-                  </td>
+        <>
+          {/* Desktop */}
+          <div className="hidden md:block bg-white rounded shadow overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
+                <tr>
+                  <th className="p-3 text-left">Paciente</th>
+                  <th className="p-3 text-left">Profissional</th>
+                  <th className="p-3 text-left">Data/Hora</th>
+                  <th className="p-3 text-left">Tipo</th>
+                  <th className="p-3 text-left">Status</th>
+                  <th className="p-3 text-left">Valor</th>
+                  <th className="p-3 text-left">Ações</th>
                 </tr>
-              ))}
-              {atendimentosFiltrados.length === 0 && (
-                <tr><td colSpan={7} className="p-4 text-center text-gray-400">Nenhum atendimento encontrado</td></tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {filtrados.map(a => (
+                  <tr key={a.id} className="border-t hover:bg-gray-50">
+                    <td className="p-3">{a.paciente_nome}</td>
+                    <td className="p-3">{a.profissional_nome}</td>
+                    <td className="p-3">{new Date(a.data_hora).toLocaleString('pt-BR')}</td>
+                    <td className="p-3">{a.tipo}</td>
+                    <td className="p-3">
+                      <span className={`px-2 py-1 rounded text-xs font-semibold ${statusCor(a.status)}`}>{a.status}</span>
+                    </td>
+                    <td className="p-3">{a.valor ? `R$ ${Number(a.valor).toFixed(2)}` : '—'}</td>
+                    <td className="p-3 flex gap-2">
+                      <button onClick={() => handleEditar(a)} className="bg-yellow-400 text-white px-3 py-1 rounded cursor-pointer hover:bg-yellow-500">Editar</button>
+                      <button onClick={() => handleDeletar(a.id)} className="bg-red-500 text-white px-3 py-1 rounded cursor-pointer hover:bg-red-600">Deletar</button>
+                    </td>
+                  </tr>
+                ))}
+                {filtrados.length === 0 && (
+                  <tr><td colSpan={7} className="p-4 text-center text-gray-400">Nenhum atendimento encontrado</td></tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile */}
+          <div className="md:hidden flex flex-col gap-3">
+            {filtrados.length === 0 && <p className="text-center text-gray-400 py-6">Nenhum atendimento encontrado</p>}
+            {filtrados.map(a => (
+              <div key={a.id} className="bg-white rounded shadow p-4 flex flex-col gap-1.5">
+                <div className="flex justify-between items-start">
+                  <p className="font-medium text-gray-800">{a.paciente_nome}</p>
+                  <span className={`px-2 py-0.5 rounded text-xs font-semibold ${statusCor(a.status)}`}>{a.status}</span>
+                </div>
+                <p className="text-sm text-gray-500">Profissional: {a.profissional_nome}</p>
+                <p className="text-sm text-gray-500">Data: {new Date(a.data_hora).toLocaleString('pt-BR')}</p>
+                <p className="text-sm text-gray-500">Tipo: {a.tipo}</p>
+                <p className="text-sm text-gray-500">Valor: {a.valor ? `R$ ${Number(a.valor).toFixed(2)}` : '—'}</p>
+                <div className="flex gap-2 mt-2">
+                  <button onClick={() => handleEditar(a)} className="flex-1 bg-yellow-400 text-white py-1.5 rounded cursor-pointer hover:bg-yellow-500 text-sm">Editar</button>
+                  <button onClick={() => handleDeletar(a.id)} className="flex-1 bg-red-500 text-white py-1.5 rounded cursor-pointer hover:bg-red-600 text-sm">Deletar</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   )

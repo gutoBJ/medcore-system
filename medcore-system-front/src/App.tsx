@@ -20,7 +20,7 @@ function App() {
         <Route path="/*" element={
           <RotaProtegida>
             <Navbar />
-            <div className="p-6">
+            <div className="p-3 md:p-6">
               <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" />} />
                 <Route path="/dashboard" element={<Dashboard />} />
