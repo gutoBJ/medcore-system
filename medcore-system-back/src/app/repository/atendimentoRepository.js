@@ -20,6 +20,21 @@ const findById = async (id) => {
   return result.rows[0]
 }
 
+const findByData = async (data) => {
+  const result = await pool.query(
+    `SELECT atendimentos.*, 
+            pacientes.nome_completo AS paciente_nome,
+            profissionais.nome AS profissional_nome
+     FROM atendimentos
+     INNER JOIN pacientes ON pacientes.id = atendimentos.paciente_id
+     INNER JOIN profissionais ON profissionais.id = atendimentos.profissional_id
+     WHERE DATE(atendimentos.data_hora) = $1
+     ORDER BY atendimentos.data_hora`,
+    [data]
+  )
+  return result.rows
+}
+
 const create = async ({ paciente_id, profissional_id, data_hora, tipo, status, diagnostico, observacoes, valor }) => {
   const result = await pool.query(
     `INSERT INTO atendimentos 
@@ -47,4 +62,4 @@ const remove = async (id) => {
   await pool.query("DELETE FROM atendimentos WHERE id = $1", [id])
 }
 
-module.exports = { findAll, findById, create, update, remove }
+module.exports = { findAll, findById, findByData, create, update, remove }

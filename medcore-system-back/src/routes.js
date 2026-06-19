@@ -41,6 +41,7 @@ router.delete('/profissionais/:id', autenticar, profissionalController.remover)
 const atendimentoController = require("./app/controllers/atendimentoController")
 
 router.get('/atendimentos', autenticar, atendimentoController.listarTodos)
+router.get('/atendimentos/filtrar', autenticar, atendimentoController.filtrarPorData)
 router.get('/atendimentos/:id', autenticar, atendimentoController.buscarPorId)
 router.post('/atendimentos', autenticar, atendimentoController.criar)
 router.put('/atendimentos/:id', autenticar, atendimentoController.atualizar)

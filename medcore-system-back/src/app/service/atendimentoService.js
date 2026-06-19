@@ -10,6 +10,11 @@ const buscarPorId = async (id) => {
   return atendimento
 }
 
+const filtrarPorData = async (data) => {
+  if (!data) throw new Error('Data é obrigatória')
+  return await repository.findByData(data)
+}
+
 const criar = async (dados) => {
   if (!dados.tipo) throw new Error('O campo tipo é obrigatório')
   return await repository.create(dados)
@@ -26,4 +31,4 @@ const remover = async (id) => {
   await repository.remove(id)
 }
 
-module.exports = { listarTodos, buscarPorId, criar, atualizar, remover }
+module.exports = { listarTodos, buscarPorId, filtrarPorData, criar, atualizar, remover }

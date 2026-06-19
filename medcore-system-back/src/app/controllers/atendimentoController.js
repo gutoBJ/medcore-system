@@ -18,6 +18,15 @@ const buscarPorId = async (req, res) => {
   }
 }
 
+const filtrarPorData = async (req, res) => {
+  try {
+    const dados = await service.filtrarPorData(req.query.data)
+    res.json(dados)
+  } catch (error) {
+    res.status(400).json({ erro: error.message })
+  }
+}
+
 const criar = async (req, res) => {
   try {
     const dados = await service.criar(req.body)
@@ -45,4 +54,4 @@ const remover = async (req, res) => {
   }
 }
 
-module.exports = { listarTodos, buscarPorId, criar, atualizar, remover }
+module.exports = { listarTodos, buscarPorId, filtrarPorData, criar, atualizar, remover }
