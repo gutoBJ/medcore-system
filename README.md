@@ -6,6 +6,11 @@ Inspirado em sistemas HIS reais como o Tasy (Philips), o MedCore System oferece 
 
 ---
 
+## Deploys do projeto:
+
+- **Backend**: https://medcore-system-back-production.up.railway.app
+- **Frontend**: https://medcore-system.vercel.app/login
+
 ## Tecnologias utilizadas
 
 **Backend**
