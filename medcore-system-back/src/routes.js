@@ -1,11 +1,12 @@
 const express = require('express')
 const router = express.Router()
 const autenticar = require('./app/middlewares/auth')
+const { somenteAdmin } = require('./app/middlewares/auth')
 
 // Rotas públicas (não exigem token)
 const authController = require('./app/controllers/authController')
-router.post('/auth/register', authController.register)
 router.post('/auth/login', authController.login)
+router.post('/auth/register', autenticar, somenteAdmin, authController.register)
 
 
 // Rotas protegidas (exigem token)

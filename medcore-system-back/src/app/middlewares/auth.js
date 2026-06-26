@@ -15,4 +15,13 @@ const autenticar = (req, res, next) => {
   }
 }
 
+const somenteAdmin = (req, res, next) => {
+  if (req.usuario?.perfil !== 'ADMIN') {
+    return res.status(403).json({ erro: 'Apenas usuarios ADMIN podem acessar este recurso' })
+  }
+
+  next()
+}
+
 module.exports = autenticar
+module.exports.somenteAdmin = somenteAdmin

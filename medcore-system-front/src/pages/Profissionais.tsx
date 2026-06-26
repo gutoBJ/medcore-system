@@ -8,7 +8,9 @@ interface Profissional {
   id: number
   nome: string
   registro: string
-  especialidade_id: number
+  especialidade_id?: number
+  especialidade_ids: number[]
+  especialidades_nomes?: string
   cargo: string
   turno: string
   telefone: string
@@ -17,7 +19,7 @@ interface Profissional {
 }
 
 const inicial: Omit<Profissional, 'id'> = {
-  nome: '', registro: '', especialidade_id: 0,
+  nome: '', registro: '', especialidade_id: 0, especialidade_ids: [],
   cargo: '', turno: '', telefone: '', email: '', ativo: true,
 }
 
@@ -49,6 +51,11 @@ export default function Profissionais() {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
+  const handleEspecialidadesChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selecionadas = Array.from(e.target.selectedOptions, option => Number(option.value))
+    setForm({ ...form, especialidade_ids: selecionadas, especialidade_id: selecionadas[0] || 0 })
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.nome || !form.registro) { toast.error('Nome e registro são obrigatórios'); return }
@@ -68,7 +75,10 @@ export default function Profissionais() {
 
   const handleEditar = (p: Profissional) => {
     const { id, ...dados } = p
-    setForm(dados); setEditandoId(id); setMostrarForm(true)
+    setForm({
+      ...dados,
+      especialidade_ids: dados.especialidade_ids?.length ? dados.especialidade_ids : (dados.especialidade_id ? [dados.especialidade_id] : []),
+    }); setEditandoId(id); setMostrarForm(true)
   }
 
   const handleDeletar = async (id: number) => {
@@ -85,7 +95,10 @@ export default function Profissionais() {
     p.nome.toLowerCase().includes(busca.toLowerCase())
   )
 
-  const nomeEsp = (id: number) => especialidades.find(e => e.id === id)?.nome || '—'
+  const nomesEsp = (p: Profissional) => {
+    if (p.especialidades_nomes) return p.especialidades_nomes
+    return p.especialidade_ids?.map(id => especialidades.find(e => e.id === id)?.nome).filter(Boolean).join(', ') || '—'
+  }
 
   return (
     <div>
@@ -103,8 +116,7 @@ export default function Profissionais() {
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input name="nome" placeholder="Nome *" value={form.nome} onChange={handleChange} className="border p-2 rounded md:col-span-2" />
             <input name="registro" placeholder="CRM/COREN/CRF *" value={form.registro} onChange={handleChange} className="border p-2 rounded" />
-            <select name="especialidade_id" value={form.especialidade_id} onChange={handleChange} className="border p-2 rounded cursor-pointer">
-              <option value="">Selecione a especialidade</option>
+            <select name="especialidade_ids" multiple value={form.especialidade_ids.map(String)} onChange={handleEspecialidadesChange} className="border p-2 rounded cursor-pointer min-h-28">
               {especialidades.map(e => <option key={e.id} value={e.id}>{e.nome}</option>)}
             </select>
             <input name="cargo" placeholder="Cargo" value={form.cargo} onChange={handleChange} className="border p-2 rounded" />
@@ -149,7 +161,7 @@ export default function Profissionais() {
                 <tr>
                   <th className="p-3 text-left">Nome</th>
                   <th className="p-3 text-left">Registro</th>
-                  <th className="p-3 text-left">Especialidade</th>
+                  <th className="p-3 text-left">Especialidades</th>
                   <th className="p-3 text-left">Cargo</th>
                   <th className="p-3 text-left">Turno</th>
                   <th className="p-3 text-left">Status</th>
@@ -161,7 +173,7 @@ export default function Profissionais() {
                   <tr key={p.id} className="border-t hover:bg-gray-50">
                     <td className="p-3">{p.nome}</td>
                     <td className="p-3">{p.registro}</td>
-                    <td className="p-3">{nomeEsp(p.especialidade_id)}</td>
+                    <td className="p-3">{nomesEsp(p)}</td>
                     <td className="p-3">{p.cargo || '—'}</td>
                     <td className="p-3">{p.turno || '—'}</td>
                     <td className="p-3">
@@ -194,7 +206,7 @@ export default function Profissionais() {
                   </span>
                 </div>
                 <p className="text-sm text-gray-500">Registro: {p.registro}</p>
-                <p className="text-sm text-gray-500">Especialidade: {nomeEsp(p.especialidade_id)}</p>
+                <p className="text-sm text-gray-500">Especialidades: {nomesEsp(p)}</p>
                 <p className="text-sm text-gray-500">Cargo: {p.cargo || '—'}</p>
                 <p className="text-sm text-gray-500">Turno: {p.turno || '—'}</p>
                 <div className="flex gap-2 mt-2">

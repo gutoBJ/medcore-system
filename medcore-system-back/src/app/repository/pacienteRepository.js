@@ -15,8 +15,6 @@ const findByCpf = async (cpf) => {
   return result.rows[0]
 }
 
-module.exports = { findAll, findById, findByCpf, create, update, remove }
-
 const create =  async ({nome_completo, cpf, data_nascimento, sexo, telefone, email, endereco, convenio, numero_carteirinha}) => {
     const result = await pool.query("insert into pacientes (nome_completo, cpf, data_nascimento, sexo, telefone, email, endereco, convenio, numero_carteirinha) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning *", [nome_completo, cpf, data_nascimento, sexo, telefone, email, endereco, convenio, numero_carteirinha])
 
@@ -33,4 +31,4 @@ const remove = async (id) => {
     await pool.query("delete from pacientes where id = $1", [id])
 }
 
-module.exports = { findAll, findById, create, update, remove }
+module.exports = { findAll, findById, findByCpf, create, update, remove }

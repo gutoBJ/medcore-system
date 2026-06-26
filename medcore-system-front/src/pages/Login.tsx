@@ -21,6 +21,7 @@ export default function Login() {
     try {
       const res = await api.post('/auth/login', { email, senha })
       localStorage.setItem('token', res.data.token)
+      localStorage.setItem('usuario', JSON.stringify(res.data.usuario))
 
       toast.success(`Bem-vindo, ${res.data.usuario.nome}! 👋`, {
         duration: 3000,
