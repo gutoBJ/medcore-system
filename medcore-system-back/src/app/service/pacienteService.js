@@ -1,4 +1,4 @@
-const repository = require("../repository/pacienteRepository")
+const repository = require('../repository/pacienteRepository')
 
 const listarTodos = async () => {
   return await repository.findAll()
@@ -11,18 +11,28 @@ const buscarPorId = async (id) => {
 }
 
 const criar = async (dados) => {
-  if (!dados.nome_completo) throw new Error('O campo nome é obrigatório')
+  if (!dados.nome_completo) throw new Error('O campo nome_completo é obrigatório')
+  if (!dados.cpf) throw new Error('O campo CPF é obrigatório')
+
+  const existente = await repository.findByCpf(dados.cpf)
+  if (existente) throw new Error('Já existe um paciente cadastrado com esse CPF')
+
   return await repository.create(dados)
 }
 
 const atualizar = async (id, dados) => {
-  await buscarPorId(id) // já valida se existe
-  if (!dados.nome_completo) throw new Error('O campo nome é obrigatório')
+  await buscarPorId(id)
+  if (!dados.nome_completo) throw new Error('O campo nome_completo é obrigatório')
+  if (!dados.cpf) throw new Error('O campo CPF é obrigatório')
+
+  const existente = await repository.findByCpf(dados.cpf)
+  if (existente && existente.id !== Number(id)) throw new Error('Já existe um paciente cadastrado com esse CPF')
+
   return await repository.update(id, dados)
 }
 
 const remover = async (id) => {
-  await buscarPorId(id) // já valida se existe
+  await buscarPorId(id)
   await repository.remove(id)
 }
 

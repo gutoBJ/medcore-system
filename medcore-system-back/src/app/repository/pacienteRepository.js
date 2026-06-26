@@ -10,6 +10,13 @@ const findById = async (id) => {
     return result.rows[0]
 }
 
+const findByCpf = async (cpf) => {
+  const result = await pool.query('SELECT * FROM pacientes WHERE cpf = $1', [cpf])
+  return result.rows[0]
+}
+
+module.exports = { findAll, findById, findByCpf, create, update, remove }
+
 const create =  async ({nome_completo, cpf, data_nascimento, sexo, telefone, email, endereco, convenio, numero_carteirinha}) => {
     const result = await pool.query("insert into pacientes (nome_completo, cpf, data_nascimento, sexo, telefone, email, endereco, convenio, numero_carteirinha) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) returning *", [nome_completo, cpf, data_nascimento, sexo, telefone, email, endereco, convenio, numero_carteirinha])
 
