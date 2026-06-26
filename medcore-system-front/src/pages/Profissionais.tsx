@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
 import toast from 'react-hot-toast'
+import { useAuth } from '../hooks/useAuth'
 
 interface Especialidade { id: number; nome: string }
 
@@ -31,6 +32,7 @@ export default function Profissionais() {
   const [mostrarForm, setMostrarForm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [busca, setBusca] = useState('')
+  const { isAdmin } = useAuth()
 
   const carregar = async () => {
     setLoading(true)
@@ -49,11 +51,6 @@ export default function Profissionais() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value })
-  }
-
-  const handleEspecialidadesChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const selecionadas = Array.from(e.target.selectedOptions, option => Number(option.value))
-    setForm({ ...form, especialidade_ids: selecionadas, especialidade_id: selecionadas[0] || 0 })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -104,20 +101,31 @@ export default function Profissionais() {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-gray-700">Profissionais</h1>
+        {isAdmin && (
         <button onClick={() => { setForm(inicial); setEditandoId(null); setMostrarForm(true) }}
           className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700 text-sm md:text-base">
           + Novo Profissional
         </button>
+        )}
       </div>
 
-      {mostrarForm && (
+      {mostrarForm && isAdmin && (
         <div className="bg-white p-4 md:p-6 rounded shadow mb-6">
           <h2 className="text-lg font-semibold mb-4">{editandoId ? 'Editar' : 'Novo'} Profissional</h2>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <input name="nome" placeholder="Nome *" value={form.nome} onChange={handleChange} className="border p-2 rounded md:col-span-2" />
-            <input name="registro" placeholder="CRM/COREN/CRF *" value={form.registro} onChange={handleChange} className="border p-2 rounded" />
-            <select name="especialidade_ids" multiple value={form.especialidade_ids.map(String)} onChange={handleEspecialidadesChange} className="border p-2 rounded cursor-pointer min-h-28">
-              {especialidades.map(e => <option key={e.id} value={e.id}>{e.nome}</option>)}
+            <input name="registro" placeholder="CRM *" value={form.registro} onChange={handleChange} className="border p-2 rounded" />
+            {/* Troca o select multiple por checkboxes — muito mais limpo */}
+            <select
+              name="especialidade_id"
+              value={form.especialidade_id || ''}
+              onChange={handleChange}
+              className="border p-2 rounded cursor-pointer h-10"
+            >
+              <option value="">Selecione a especialidade</option>
+              {especialidades.map(e => (
+                <option key={e.id} value={e.id}>{e.nome}</option>
+              ))}
             </select>
             <input name="cargo" placeholder="Cargo" value={form.cargo} onChange={handleChange} className="border p-2 rounded" />
             <select name="turno" value={form.turno} onChange={handleChange} className="border p-2 rounded cursor-pointer">
@@ -165,7 +173,7 @@ export default function Profissionais() {
                   <th className="p-3 text-left">Cargo</th>
                   <th className="p-3 text-left">Turno</th>
                   <th className="p-3 text-left">Status</th>
-                  <th className="p-3 text-left">Ações</th>
+                  {isAdmin && <th className="p-3 text-left">Ações</th>}
                 </tr>
               </thead>
               <tbody>
@@ -181,10 +189,10 @@ export default function Profissionais() {
                         {p.ativo ? 'Ativo' : 'Inativo'}
                       </span>
                     </td>
-                    <td className="p-3 flex gap-2">
+                    {isAdmin && (<td className="p-3 flex gap-2">
                       <button onClick={() => handleEditar(p)} className="bg-yellow-400 text-white px-3 py-1 rounded cursor-pointer hover:bg-yellow-500">Editar</button>
                       <button onClick={() => handleDeletar(p.id)} className="bg-red-500 text-white px-3 py-1 rounded cursor-pointer hover:bg-red-600">Deletar</button>
-                    </td>
+                    </td>)}
                   </tr>
                 ))}
                 {filtrados.length === 0 && (
@@ -209,10 +217,10 @@ export default function Profissionais() {
                 <p className="text-sm text-gray-500">Especialidades: {nomesEsp(p)}</p>
                 <p className="text-sm text-gray-500">Cargo: {p.cargo || '—'}</p>
                 <p className="text-sm text-gray-500">Turno: {p.turno || '—'}</p>
-                <div className="flex gap-2 mt-2">
+                {isAdmin && (<div className="flex gap-2 mt-2">
                   <button onClick={() => handleEditar(p)} className="flex-1 bg-yellow-400 text-white py-1.5 rounded cursor-pointer hover:bg-yellow-500 text-sm">Editar</button>
                   <button onClick={() => handleDeletar(p.id)} className="flex-1 bg-red-500 text-white py-1.5 rounded cursor-pointer hover:bg-red-600 text-sm">Deletar</button>
-                </div>
+                </div>)}
               </div>
             ))}
           </div>

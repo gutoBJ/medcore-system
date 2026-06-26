@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
 import toast from 'react-hot-toast'
+import { useAuth } from '../hooks/useAuth'
 
 interface Especialidade {
   id: number
@@ -21,6 +22,8 @@ export default function Especialidades() {
   const [editandoId, setEditandoId] = useState<number | null>(null)
   const [mostrarForm, setMostrarForm] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [busca, setBusca] = useState('')
+  const { isAdmin } = useAuth()
 
   const carregar = async () => {
     setLoading(true)
@@ -73,17 +76,24 @@ export default function Especialidades() {
     }
   }
 
+  const especialidadesFiltradas = especialidades.filter(e =>
+    (e.nome?.toLowerCase() || '').includes(busca.toLowerCase()) ||
+    (e.area?.toLowerCase() || '').includes(busca.toLowerCase())
+  )
+
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-gray-700">Especialidades</h1>
+        {isAdmin && (
         <button onClick={() => { setForm(inicial); setEditandoId(null); setMostrarForm(true) }}
           className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700 text-sm md:text-base">
           + Nova Especialidade
         </button>
+        )}
       </div>
 
-      {mostrarForm && (
+      {mostrarForm && isAdmin && (
         <div className="bg-white p-4 md:p-6 rounded shadow mb-6">
           <h2 className="text-lg font-semibold mb-4">{editandoId ? 'Editar' : 'Nova'} Especialidade</h2>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -102,6 +112,14 @@ export default function Especialidades() {
         </div>
       )}
 
+      <input
+        type="text"
+        placeholder="Buscar por nome ou área..."
+        value={busca}
+        onChange={e => setBusca(e.target.value)}
+        className="border p-2 rounded w-full mb-4"
+      />
+
       {loading ? (
         <div className="flex justify-center py-10">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
@@ -116,22 +134,22 @@ export default function Especialidades() {
                   <th className="p-3 text-left">Nome</th>
                   <th className="p-3 text-left">Área</th>
                   <th className="p-3 text-left">Descrição</th>
-                  <th className="p-3 text-left">Ações</th>
+                  {isAdmin && <th className="p-3 text-left">Ações</th>}
                 </tr>
               </thead>
               <tbody>
-                {especialidades.map(e => (
+                {especialidadesFiltradas.map(e => (
                   <tr key={e.id} className="border-t hover:bg-gray-50">
                     <td className="p-3">{e.nome}</td>
                     <td className="p-3">{e.area || '—'}</td>
                     <td className="p-3">{e.descricao || '—'}</td>
-                    <td className="p-3 flex gap-2">
+                    {isAdmin && (<td className="p-3 flex gap-2">
                       <button onClick={() => handleEditar(e)} className="bg-yellow-400 text-white px-3 py-1 rounded cursor-pointer hover:bg-yellow-500">Editar</button>
                       <button onClick={() => handleDeletar(e.id)} className="bg-red-500 text-white px-3 py-1 rounded cursor-pointer hover:bg-red-600">Deletar</button>
-                    </td>
+                    </td>)}
                   </tr>
                 ))}
-                {especialidades.length === 0 && (
+                {especialidadesFiltradas.length === 0 && (
                   <tr><td colSpan={4} className="p-4 text-center text-gray-400">Nenhuma especialidade cadastrada</td></tr>
                 )}
               </tbody>
@@ -140,16 +158,16 @@ export default function Especialidades() {
 
           {/* Mobile */}
           <div className="md:hidden flex flex-col gap-3">
-            {especialidades.length === 0 && <p className="text-center text-gray-400 py-6">Nenhuma especialidade cadastrada</p>}
-            {especialidades.map(e => (
+            {especialidadesFiltradas.length === 0 && <p className="text-center text-gray-400 py-6">Nenhuma especialidade cadastrada</p>}
+            {especialidadesFiltradas.map(e => (
               <div key={e.id} className="bg-white rounded shadow p-4 flex flex-col gap-1.5">
                 <p className="font-medium text-gray-800">{e.nome}</p>
                 <p className="text-sm text-gray-500">Área: {e.area || '—'}</p>
                 <p className="text-sm text-gray-500">Descrição: {e.descricao || '—'}</p>
-                <div className="flex gap-2 mt-2">
+                {isAdmin && (<div className="flex gap-2 mt-2">
                   <button onClick={() => handleEditar(e)} className="flex-1 bg-yellow-400 text-white py-1.5 rounded cursor-pointer hover:bg-yellow-500 text-sm">Editar</button>
                   <button onClick={() => handleDeletar(e.id)} className="flex-1 bg-red-500 text-white py-1.5 rounded cursor-pointer hover:bg-red-600 text-sm">Deletar</button>
-                </div>
+                </div>)}
               </div>
             ))}
           </div>

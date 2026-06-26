@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import api from '../api/axios'
 import toast from 'react-hot-toast'
+import { useAuth } from '../hooks/useAuth'
 
 interface Paciente {
   id: number
@@ -34,6 +35,7 @@ export default function Pacientes() {
   const [mostrarForm, setMostrarForm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [busca, setBusca] = useState('')
+  const { isAdmin } = useAuth()
 
   const carregarPacientes = async () => {
     setLoading(true)
@@ -104,15 +106,15 @@ export default function Pacientes() {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold text-gray-700">Pacientes</h1>
-        <button
-          onClick={() => { setForm(inicial); setEditandoId(null); setMostrarForm(true) }}
-          className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700 text-sm md:text-base"
-        >
-          + Novo Paciente
-        </button>
+        {isAdmin && (
+          <button onClick={() => { setForm(inicial); setEditandoId(null); setMostrarForm(true) }}
+            className="bg-blue-600 text-white px-4 py-2 rounded cursor-pointer hover:bg-blue-700 text-sm md:text-base">
+            + Novo Paciente
+          </button>
+        )}
       </div>
 
-      {mostrarForm && (
+      {mostrarForm && isAdmin && (
         <div className="bg-white p-4 md:p-6 rounded shadow mb-6">
           <h2 className="text-lg font-semibold mb-4">{editandoId ? 'Editar' : 'Novo'} Paciente</h2>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -164,7 +166,7 @@ export default function Pacientes() {
                   <th className="p-3 text-left">CPF</th>
                   <th className="p-3 text-left">Telefone</th>
                   <th className="p-3 text-left">Convênio</th>
-                  <th className="p-3 text-left">Ações</th>
+                  {isAdmin && <th className="p-3 text-left">Ações</th>}
                 </tr>
               </thead>
               <tbody>
@@ -174,10 +176,10 @@ export default function Pacientes() {
                     <td className="p-3">{p.cpf}</td>
                     <td className="p-3">{p.telefone}</td>
                     <td className="p-3">{p.convenio || '—'}</td>
-                    <td className="p-3 flex gap-2">
+                    {isAdmin && (<td className="p-3 flex gap-2">
                       <button onClick={() => handleEditar(p)} className="bg-yellow-400 text-white px-3 py-1 rounded cursor-pointer hover:bg-yellow-500">Editar</button>
                       <button onClick={() => handleDeletar(p.id)} className="bg-red-500 text-white px-3 py-1 rounded cursor-pointer hover:bg-red-600">Deletar</button>
-                    </td>
+                    </td>)}
                   </tr>
                 ))}
                 {pacientesFiltrados.length === 0 && (
@@ -198,10 +200,10 @@ export default function Pacientes() {
                 <p className="text-sm text-gray-500">CPF: {p.cpf}</p>
                 <p className="text-sm text-gray-500">Telefone: {p.telefone || '—'}</p>
                 <p className="text-sm text-gray-500">Convênio: {p.convenio || '—'}</p>
-                <div className="flex gap-2 mt-2">
+                {isAdmin && (<div className="flex gap-2 mt-2">
                   <button onClick={() => handleEditar(p)} className="flex-1 bg-yellow-400 text-white py-1.5 rounded cursor-pointer hover:bg-yellow-500 text-sm">Editar</button>
                   <button onClick={() => handleDeletar(p.id)} className="flex-1 bg-red-500 text-white py-1.5 rounded cursor-pointer hover:bg-red-600 text-sm">Deletar</button>
-                </div>
+                </div>)}
               </div>
             ))}
           </div>
